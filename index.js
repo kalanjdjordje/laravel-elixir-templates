@@ -19,9 +19,10 @@ var config = Elixir.config;
  */
 
 Elixir.extend('templates', function(src,output,options) {
+  new Elixir.Log.message('Generate templates...');
   var paths = new Elixir.GulpPaths()
                 .src(src, './resources/assets/templates/**/*.html')
-                .output(output || config.get('public.js.outputFolder') + '/templates.js' || 'resources/assets/js/templates.js');
+                .output(output || 'resources/assets/js/templates.js');
 
   new Task('templates', function() {
     return gulp.src(paths.src.path)
@@ -46,7 +47,9 @@ Elixir.extend('templates', function(src,output,options) {
         }
       }))
       .pipe(concat(paths.output.name))
-      .pipe(gulp.dest(paths.output.baseDir));
+      .pipe(new Elixir.Notification('Templates concat: ' + paths.output.name))
+      .pipe(gulp.dest(paths.output.baseDir))
+      .pipe(new Elixir.Notification('Templates saved: ' + paths.output.baseDir));
   })
   .watch(paths.src.path);
 });
