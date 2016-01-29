@@ -1,6 +1,6 @@
 {
   "name": "laravel-elixir-templates",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Module for laravel elixir for packing html templates to js file",
   "author": "Kalanj Djordje <kalanjdjordje@gmail.com>",
   "contributors": [{
@@ -26,8 +26,7 @@
   },
   "dependencies": {
     "gulp-concat": "^2.6.0",
-    "gulp-wrap": "^0.11.0",
-    "handlebars": "^4.0.5"
+    "gulp-wrap": "^0.11.0"
   },
   "licence": "MIT"
 }
