@@ -17,13 +17,14 @@ var config = Elixir.config;
  | the number of HTTP requests then to load each template sepratly.
  |
  */
-Elixir.extend('templates', function(src,dest) {
-  var paths = Elixir.GulpPaths()
-                .src(src, config.get('assets.templates.folder'))
-                .output(dest || config.get('public.js.outputFolder') || 'js/templates.js');
-  console.log(paths);
+
+Elixir.extend('templates', function(src,output,options) {
+  var paths = new Elixir.GulpPaths()
+                .src(src, './resources/assets/templates/**/*.html')
+                .output(output || config.get('public.js.outputFolder') + '/templates.js' || 'resources/assets/js/templates.js');
+
   new Task('templates', function() {
-    return gulp.src(paths.src)
+    return gulp.src(paths.src.path)
       .pipe(wrap('<%= processContent(file.relative,contents) %>',{},{
         imports:{
           processContent:function(file,content){
@@ -44,8 +45,8 @@ Elixir.extend('templates', function(src,dest) {
           }
         }
       }))
-      .pipe(concat())
-      .pipe(gulp.dest(dest));
+      .pipe(concat(paths.output.name))
+      .pipe(gulp.dest(paths.output.baseDir));
   })
   .watch(paths.src.path);
 });
