@@ -53,7 +53,7 @@ Elixir.extend('templates', function(src,output,options) {
             }
           }
         }
-      }))
+      ))
       .pipe(concat(paths.output.name))
       .pipe(new Elixir.Notification('Templates concat: ' + paths.output.name))
       .pipe(gulp.dest(paths.output.baseDir))
