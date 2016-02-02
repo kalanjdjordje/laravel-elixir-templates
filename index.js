@@ -7,6 +7,12 @@ var concat = require('gulp-concat');
 var wrap = require('gulp-wrap');
 
 var config = Elixir.config;
+
+var handlebarsHandler = require('lib/handlebars-handler');
+var handlers = {};
+handlers["handlebars"] = handlebarsHandler;
+
+
 /*
  |----------------------------------------------------------------
  | Convert html templates of handlebar to js
@@ -24,24 +30,26 @@ Elixir.extend('templates', function(src,output,options) {
                 .src(src, './resources/assets/templates/**/*.html')
                 .output(output || 'resources/assets/js/templates.js');
 
+  options.engine = options.engine || "handlebars";
+
+  options.namespace = options.namespace || handlers[options.engine].defaultNamespace;
+  options.partialRegex = options.partialRegex || handlers[options.engine].partialRegex;
+  options.filenameConvert = options.filenameConvert || function(filename, isPartial) { return filename;};
+
+  options.onlyPartials = options.onlyPartials || false;
+  options.onlyNoPartials = options.onlyNoPartials || false;
+
   new Task('templates', function() {
     return gulp.src(paths.src.path)
       .pipe(wrap('<%= processContent(file.relative,contents) %>',{},{
-        imports:{
-          processContent:function(file,content){
-            function camelCase(input) { 
-              return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
-                return group1.toUpperCase();
-              });
-            }
-
-            var template = JSON.stringify(content.toString().replace(/\n[ ]*/g,''));
-            if(file.indexOf('partials') === 0){
-              file = camelCase(file.replace('partials/','').replace('.html',''));
-              return 'Handlebars.registerPartial("' + file +'", ' + template+ ');';
-            } else {
-            return 'App.templates["' + file.replace('.html','') + '"] = Handlebars.compile(' + template + ');';
-
+          imports:{
+            processContent:function(file,content){
+              var template = JSON.stringify(content.toString().replace(/\n[ ]*/g,''));
+              if(options.engine === "handlebars"){
+                return handlers[options.engine](file,template,options);
+              } else {
+                new Elixir.Log.message('Engine is not suported: ' + options.engine);
+              }
             }
           }
         }
